@@ -1,7 +1,7 @@
 {
   "name": "buy-again",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "workspaces": [
     "extensions/*"
   ],

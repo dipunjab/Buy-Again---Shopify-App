@@ -12,5 +12,12 @@ target = "customer-account.order.action.menu-item.render"
 
 [extensions.capabilities]
 api_access = true
-network_access = true
+
+[settings]
+
+[[settings.fields]]
+key = "button_label"
+type = "single_line_text_field"
+name = "Button label"
+description = "The text shown on the order action button. Defaults to Buy again."
 

@@ -1,4 +1,5 @@
 import "@shopify/ui-extensions/preact";
+import {useSettings} from "@shopify/ui-extensions/customer-account/preact";
 import {render} from "preact";
 import {useEffect, useState} from "preact/hooks";
 
@@ -37,6 +38,8 @@ export default async () => {
 function MenuActionItem() {
   const orderFromTarget = shopify.order?.value;
   const orderId = orderFromTarget?.id ?? shopify.orderId;
+  const {button_label: buttonLabel} = useSettings();
+  const label = getButtonLabel(buttonLabel);
 
   const [cartUrl, setCartUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -88,15 +91,21 @@ function MenuActionItem() {
 
   return (
     <s-button
-      accessibilityLabel="Buy these order items again"
+      accessibilityLabel={`${label} - add these order items to cart`}
       disabled={loading || !cartUrl}
       href={cartUrl}
       loading={loading}
       tone="critical"
     >
-      Buy again
+      {label}
     </s-button>
   );
+}
+
+function getButtonLabel(value) {
+  const label = String(value ?? "").trim();
+
+  return label || "Buy again";
 }
 
 function buildReorderItems(order) {

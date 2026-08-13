@@ -22,6 +22,7 @@ lerna-debug.log*
 # Build
 dist
 shared/types/graphql
+extensions/*/manifest.json
 *.local
 
 # Editor directories and files

@@ -1,180 +1,167 @@
-import {useState, useEffect} from 'preact/hooks';
-import {useLocation} from 'preact-iso';
-import {listFAQs, primeFAQ} from '../../../../shared/models/faq';
-import {gidToId} from '../../../../shared/utils/gid';
+const HIGHLIGHTS = [
+  {
+    label: '01',
+    title: 'Native order action',
+    body: 'Adds a Buy again action to Shopify customer account order pages.',
+  },
+  {
+    label: '02',
+    title: 'Cart preserving',
+    body: 'Uses Shopify cart add routes so existing cart items are not cleared.',
+  },
+  {
+    label: '03',
+    title: 'No storefront script',
+    body: 'Runs only when Shopify renders the customer account extension target.',
+  },
+];
 
-/** @typedef {import('../../../../shared/models/faq').FAQSummary} FAQSummary */
+const STEPS = [
+  'Run the app locally with Shopify CLI.',
+  'Open the checkout and accounts editor.',
+  'Add the Buy again order action to customer accounts.',
+  'Optionally rename the button label in the extension settings.',
+];
 
 export default function HomePage() {
-  const location = useLocation();
-  const [faqs, setFaqs] = useState(/** @type {FAQSummary[]} */ ([]));
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      setFaqs(await listFAQs());
-      setLoading(false);
-    })();
-  }, []);
-
-  /**
-   * @param {Event} event
-   * @param {FAQSummary} faq
-   */
-  const openFAQ = (event, faq) => {
-    const mouseEvent = /** @type {MouseEvent} */ (event);
-    if (
-      mouseEvent.defaultPrevented ||
-      mouseEvent.button !== 0 ||
-      mouseEvent.metaKey ||
-      mouseEvent.altKey ||
-      mouseEvent.ctrlKey ||
-      mouseEvent.shiftKey
-    ) {
-      return;
-    }
-
-    const id = gidToId(faq.id);
-    mouseEvent.preventDefault();
-    primeFAQ(id, faq);
-    location.route(`/faq/${id}`);
-  };
-
-  const hasFaqs = faqs.length > 0;
-
   return (
-    <s-page heading="FAQs">
-      <s-button slot="primary-action" variant="primary" href="/faq/new">
-        Create FAQ
+    <s-page heading="Buy Again">
+      <s-button
+        slot="primary-action"
+        variant="primary"
+        href="shopify://admin/settings/customer_accounts"
+      >
+        Configure in editor
       </s-button>
 
-      {!loading && (
-        <s-section slot="aside" heading={shopify.i18n.translate('welcome', {target: shopify.extension.target})}>
-          <s-stack direction="inline" gap="small" alignItems="center">
-            <s-paragraph>
-              <s-text>Framework: </s-text>
-              <s-link href="https://preactjs.com/" target="_blank">
-                Preact
-              </s-link>
-            </s-paragraph>
-            <s-link href="https://preactjs.com/" target="_blank">
-              <s-box maxInlineSize="24px" maxBlockSize="24px">
-                <s-image src="./preact-logo.png" alt="Preact logo" />
-              </s-box>
-            </s-link>
-          </s-stack>
-          <s-stack direction="inline" gap="small" alignItems="center">
-            <s-paragraph>
-              <s-text>Interface: </s-text>
-              <s-link
-                href="https://shopify.dev/docs/api/app-home/web-components"
-                target="_blank"
-              >
-                Polaris web components
-              </s-link>
-            </s-paragraph>
-            <s-link
-              href="https://shopify.dev/docs/api/app-home/web-components"
-              target="_blank"
-            >
-              <s-box maxInlineSize="32px" maxBlockSize="32px">
-                <s-image src="./polaris-icon.png" alt="Polaris logo" />
-              </s-box>
-            </s-link>
-          </s-stack>
-          <s-stack direction="inline" gap="small" alignItems="center">
-            <s-paragraph>
-              <s-text>API: </s-text>
-              <s-link
-                href="https://shopify.dev/docs/api/admin-graphql"
-                target="_blank"
-              >
-                GraphQL Admin API
-              </s-link>
-            </s-paragraph>
-            <s-link
-              href="https://shopify.dev/docs/api/admin-graphql"
-              target="_blank"
-            >
-              <s-box maxInlineSize="24px" maxBlockSize="24px">
-                <s-image src="./graphql-logo.png" alt="GraphQL logo" />
-              </s-box>
-            </s-link>
-          </s-stack>
-          <s-paragraph>
-            <s-text>Database: </s-text>
-            <s-link
-              href="https://shopify.dev/docs/apps/build/custom-data/metaobjects"
-              target="_blank"
-            >
-              Metaobjects
-            </s-link>
-          </s-paragraph>
-        </s-section>
-      )}
+      <s-section>
+        <s-box
+          background="strong"
+          border="base strong"
+          borderRadius="large-200"
+          padding="large-500"
+        >
+          <s-grid
+            gridTemplateColumns="minmax(0, 1.25fr) minmax(280px, 0.75fr)"
+            gap="large-500"
+            alignItems="center"
+          >
+            <s-stack direction="block" gap="large-200">
+              <s-stack direction="inline" gap="small" alignItems="center">
+                <s-badge tone="neutral" color="strong">
+                  Open source
+                </s-badge>
+                <s-badge tone="success">Free to use</s-badge>
+              </s-stack>
 
-      {!loading && !hasFaqs && (
-        <s-section accessibilityLabel="Empty state section">
-          <s-grid gap="base" justifyItems="center" paddingBlock="large-400">
-            <s-box maxInlineSize="200px" maxBlockSize="200px">
-              <s-image
-                aspectRatio="1/0.5"
-                src="https://cdn.shopify.com/static/images/polaris/patterns/callout.png"
-                alt="Illustration of FAQ creation"
-              />
-            </s-box>
-            <s-grid justifyItems="center" maxInlineSize="450px" gap="base">
-              <s-stack alignItems="center">
-                <s-heading>Start creating FAQs</s-heading>
+              <s-stack direction="block" gap="base">
+                <s-heading>One-click reordering for Shopify customer accounts.</s-heading>
                 <s-paragraph>
-                  Create frequently asked questions to boost sales.
+                  A lightweight customer account extension that lets shoppers
+                  add products from a previous order back to their cart without
+                  installing storefront JavaScript or touching the theme.
                 </s-paragraph>
               </s-stack>
+
               <s-button-group>
                 <s-button
                   slot="primary-action"
-                  accessibilityLabel="Add a new FAQ"
-                  href="/faq/new"
+                  variant="primary"
+                  href="shopify://admin/settings/customer_accounts"
                 >
-                  Create FAQ
+                  Add to customer accounts
+                </s-button>
+                <s-button
+                  slot="secondary-actions"
+                  variant="secondary"
+                  href="https://shopify.dev/docs/apps/build/customer-accounts/order-action-extensions"
+                  target="_blank"
+                >
+                  Read Shopify docs
                 </s-button>
               </s-button-group>
-            </s-grid>
-          </s-grid>
-        </s-section>
-      )}
+            </s-stack>
 
-      {!loading && hasFaqs && (
-        <s-section padding="none" accessibilityLabel="FAQs table section">
-          <s-table>
-            <s-table-header-row>
-              <s-table-header listSlot="primary">Question</s-table-header>
-              <s-table-header>FAQ page</s-table-header>
-            </s-table-header-row>
-            <s-table-body>
-              {faqs.map((faq) => (
-                <s-table-row key={faq.id}>
-                  <s-table-cell>
-                    <s-link
-                      href={`/faq/${gidToId(faq.id)}`}
-                      onClick={(event) => openFAQ(event, faq)}
-                    >
-                      {faq.question || 'Untitled'}
-                    </s-link>
-                  </s-table-cell>
-                  <s-table-cell>
-                    <s-badge
-                      tone={faq.show_on_faq_page ? 'auto' : 'neutral'}
-                    >
-                      {faq.show_on_faq_page ? 'Shown' : 'Hidden'}
-                    </s-badge>
-                  </s-table-cell>
-                </s-table-row>
-              ))}
-            </s-table-body>
-          </s-table>
-        </s-section>
-      )}
+            <s-box
+              background="base"
+              border="base strong"
+              borderRadius="large-200"
+              padding="large-300"
+            >
+              <s-stack direction="block" gap="base">
+                <s-text color="subdued">Customer journey</s-text>
+                <s-heading>Order to Buy again to Cart</s-heading>
+                <s-paragraph>
+                  The app stays out of the storefront and only appears in the
+                  customer account surfaces selected by the merchant.
+                </s-paragraph>
+              </s-stack>
+            </s-box>
+          </s-grid>
+        </s-box>
+      </s-section>
+
+      <s-section heading="Built for a small, focused job">
+        <s-grid gridTemplateColumns="repeat(3, minmax(0, 1fr))" gap="base">
+          {HIGHLIGHTS.map((item) => (
+            <s-box
+              key={item.title}
+              background="base"
+              border="base"
+              borderRadius="large"
+              padding="large-200"
+            >
+              <s-stack direction="block" gap="base">
+                <s-badge tone="neutral" color="strong">
+                  {item.label}
+                </s-badge>
+                <s-heading>{item.title}</s-heading>
+                <s-paragraph>{item.body}</s-paragraph>
+              </s-stack>
+            </s-box>
+          ))}
+        </s-grid>
+      </s-section>
+
+      <s-section heading="How merchants use it">
+        <s-box background="base" border="base" borderRadius="large" padding="large-200">
+          <s-stack direction="block" gap="base">
+            {STEPS.map((step, index) => (
+              <s-stack key={step} direction="inline" gap="base" alignItems="start">
+                <s-badge tone="neutral" color="strong">
+                  {index + 1}
+                </s-badge>
+                <s-paragraph>{step}</s-paragraph>
+              </s-stack>
+            ))}
+          </s-stack>
+        </s-box>
+      </s-section>
+
+      <s-section slot="aside" heading="Extension scope">
+        <s-stack direction="block" gap="base">
+          <s-box background="base" border="base" borderRadius="large" padding="base">
+            <s-stack direction="block" gap="small">
+              <s-badge tone="success">Scoped</s-badge>
+              <s-heading>No theme performance hit</s-heading>
+              <s-paragraph>
+                This app does not inject scripts into every storefront page. It
+                runs where the customer account extension target is mounted.
+              </s-paragraph>
+            </s-stack>
+          </s-box>
+
+          <s-box background="subdued" border="base" borderRadius="large" padding="base">
+            <s-stack direction="block" gap="small">
+              <s-heading>Button label setting</s-heading>
+              <s-paragraph>
+                Merchants can rename the action from the checkout and accounts
+                editor using the Button label setting.
+              </s-paragraph>
+            </s-stack>
+          </s-box>
+        </s-stack>
+      </s-section>
     </s-page>
   );
 }
