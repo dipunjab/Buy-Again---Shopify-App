@@ -1,0 +1,17 @@
+{
+  "buyAgain": "Buy again",
+  "done": "Done",
+  "buyAgainHeading": "Ready for another round?",
+  "earnedPoints": "You earned 1,000 reward points",
+  "earnedPointsDescription": "Nice move - {{orderName}} pushed you into Platinum tier. Your next reorder keeps the momentum going.",
+  "earnPoints": "You've earned 1,000 points from this order. You've been upgraded to Platinum tier.",
+  "fasterCheckout": "Skip the hunt and reorder your favorites faster",
+  "keepRewards": "Keep collecting points toward your next reward",
+  "platinumTier": "Platinum tier",
+  "rewardUnlocked": "Reward unlocked",
+  "sameItems": "Bring back the same items from this order",
+  "startReorder": "Start reorder",
+  "thisOrder": "this order",
+  "vipBenefits": "VIP benefits",
+  "whyBuyAgain": "Why buy again?"
+}

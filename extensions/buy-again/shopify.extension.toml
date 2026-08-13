@@ -1,0 +1,16 @@
+api_version = "2026-07"
+
+[[extensions]]
+name = "buy-again"
+handle = "buy-again"
+type = "ui_extension"
+uid = "15dd4ece-0fdd-6b86-4101-a6ccb94c47ce47299618"
+
+[[extensions.targeting]]
+module = "./src/MenuActionItem.jsx"
+target = "customer-account.order.action.menu-item.render"
+
+[extensions.capabilities]
+api_access = true
+network_access = true
+
