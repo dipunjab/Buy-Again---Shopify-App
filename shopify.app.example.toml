@@ -1,0 +1,23 @@
+# Copy this file to shopify.app.toml, or run:
+#   shopify app config link
+#
+# Do not commit your real shopify.app.toml.
+# It contains your Shopify app client_id, which identifies your Partner app.
+
+client_id = "replace-with-your-shopify-client-id"
+name = "buy-again"
+application_url = "https://shopify.dev/apps/default-app-home"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2026-10"
+
+[access_scopes]
+scopes = "customer_read_orders"
+
+[auth]
+redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]

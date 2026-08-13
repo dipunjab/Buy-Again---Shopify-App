@@ -14,10 +14,14 @@ lerna-debug.log*
 # Ignore shopify files created during app dev
 .shopify/*
 .shopify.lock
+shopify.app.toml
+shopify.app.*.toml
+!shopify.app.example.toml
 
 # Environment variables
 .env
 .env.*
+!.env.example
 
 # Build
 dist
