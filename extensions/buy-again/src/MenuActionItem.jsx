@@ -49,33 +49,87 @@ function MenuActionItem() {
 
     async function prepareCartLink() {
       if (!orderId) {
+        console.warn("[buy-again] No order ID provided by the target.");
+        setCartUrl("");
         setLoading(false);
         return;
       }
 
       try {
-        const [orderResponse, shopResponse] = await Promise.all([
-          fetch("shopify://customer-account/api/2026-07/graphql.json", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-              query: ORDER_QUERY,
-              variables: {id: orderId},
-            }),
-          }).then((response) => response.json()),
-          shopify.query(SHOP_QUERY),
-        ]);
+        const orderResponse = await fetch("shopify://customer-account/api/2026-07/graphql.json", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            query: ORDER_QUERY,
+            variables: {id: orderId},
+          }),
+        }).then((response) => response.json());
 
         if (cancelled) return;
 
-        const order = orderResponse.data?.order;
-        const shopDomain = shopResponse.data?.shop?.primaryDomain?.host;
-        const reorderItems = buildReorderItems(order);
+        if (orderResponse.errors) {
+          const message = JSON.stringify(orderResponse.errors);
+          console.warn("[buy-again] Customer account order query error:", message);
 
-        if (shopDomain && reorderItems.length > 0) {
-          setCartUrl(buildCartAddUrl(shopDomain, reorderItems));
+          if (message.includes("protected customer data")) {
+            console.error("[buy-again] App has no Level 1 protected customer data access. Use Custom distribution and install via the install link.");
+          }
+          if (message.includes("customer_read_orders") || message.includes("Access denied")) {
+            console.error("[buy-again] Missing customer_read_orders scope. Add it to shopify.app.toml, run npm run deploy, then uninstall and reinstall the app and log in again as the customer.");
+          }
+
+          setCartUrl("");
+          setLoading(false);
+          return;
         }
-      } catch {
+
+        const order = orderResponse.data?.order;
+        if (!order) {
+          console.warn("[buy-again] Order not found for this customer.");
+          setCartUrl("");
+          setLoading(false);
+          return;
+        }
+
+        const reorderItems = buildReorderItems(order);
+        if (!reorderItems.length) {
+          console.warn("[buy-again] Order has no reorderable items (deleted or custom line items have no variant).");
+          setCartUrl("");
+          setLoading(false);
+          return;
+        }
+
+        const shopResponse = await shopify.query(SHOP_QUERY);
+
+        if (cancelled) return;
+
+        if (shopResponse.errors) {
+          const message = JSON.stringify(shopResponse.errors);
+          console.warn("[buy-again] Shop query error:", message);
+
+          if (message.includes("protected customer data")) {
+            console.error("[buy-again] App has no Level 1 protected customer data access. Use Custom distribution and install via the install link.");
+          }
+          if (message.includes("customer_read_orders") || message.includes("Access denied")) {
+            console.error("[buy-again] Missing customer_read_orders scope. Add it to shopify.app.toml, run npm run deploy, then uninstall and reinstall the app and log in again as the customer.");
+          }
+
+          setCartUrl("");
+          setLoading(false);
+          return;
+        }
+
+        const shopDomain = shopResponse.data?.shop?.primaryDomain?.host;
+        if (!shopDomain) {
+          console.warn("[buy-again] Unable to resolve the shop primary domain.");
+          setCartUrl("");
+          setLoading(false);
+          return;
+        }
+
+        setCartUrl(buildCartAddUrl(shopDomain, reorderItems));
+      } catch (error) {
+        console.error("[buy-again] Failed to prepare cart link", error);
         setCartUrl("");
       } finally {
         if (!cancelled) setLoading(false);
