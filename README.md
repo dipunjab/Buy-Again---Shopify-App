@@ -23,20 +23,6 @@ This app is intentionally small:
 
 It is a focused Shopify extension-only app that does one job: help customers repeat a previous order faster.
 
-## Why this app exists
-
-Many Shopify stores rely on repeat purchases: consumables, supplements, beauty products, food, pet supplies, office supplies, custom products, B2B items, and subscription-adjacent reorder flows.
-
-Customers often know exactly what they bought last time. Making them search the store again creates unnecessary friction.
-
-Buy Again gives customers a faster path:
-
-```txt
-Customer account -> Previous order -> Buy again -> Cart
-```
-
-That means fewer clicks, less searching, and a smoother repeat purchase journey.
-
 ## Features
 
 - Adds a **Buy again** order action inside Shopify customer accounts
@@ -48,25 +34,6 @@ That means fewer clicks, less searching, and a smoother repeat purchase journey.
 - Includes a clean Shopify Admin app home page
 - Extension-only architecture, so no hosting is required for the default setup
 - MIT licensed and easy to fork
-
-## What the customer sees
-
-On a customer account order page, the app adds a simple order action:
-
-```txt
-Buy again
-```
-
-When clicked, the app prepares the reorder URL and sends the shopper to the storefront cart.
-
-## What the merchant sees
-
-The Shopify Admin app home explains:
-
-- What the app does
-- How to add it in the customer account editor
-- Why it does not affect storefront performance
-- How merchants can rename the button label
 
 ## Performance-friendly by design
 
@@ -119,109 +86,6 @@ extensions/buy-again/src/MenuActionItem.jsx
 
 The default flow uses Shopify's cart URL behavior instead of a custom backend.
 
-## Hosting
-
-No hosting is required for the default extension-only version.
-
-You do not need:
-
-- Vercel
-- Render
-- Railway
-- Fly.io
-- Heroku
-- A VPS
-- A custom Node/Express backend
-
-For the default open-source setup, deploying with Shopify CLI is enough:
-
-```bash
-shopify app deploy
-```
-
-Shopify hosts the extension bundles.
-
-## Requirements
-
-- Node.js
-- npm
-- Shopify CLI
-- Shopify Partner account
-- Shopify development store
-- New customer accounts enabled
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone <your-repository-url>
-cd buy-again
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-## Important: connect your own Shopify app
-
-This repository does not commit a real `shopify.app.toml` file.
-
-That is intentional.
-
-Each developer or merchant should link the project to their own Shopify Partner app before running or deploying it:
-
-```bash
-shopify app config link
-```
-
-You can also copy the example file:
-
-```bash
-cp shopify.app.example.toml shopify.app.toml
-```
-
-Then replace:
-
-```toml
-client_id = "replace-with-your-shopify-client-id"
-```
-
-with your own Shopify app client ID from the Shopify Partner Dashboard.
-
-Do not commit your real `shopify.app.toml`.
-
-`client_id` is a public app identifier, not a secret, but committing a real app-specific config can confuse other users and accidentally link forks to the wrong Partner app.
-
-Start local development:
-
-```bash
-npm run dev
-```
-
-Or directly:
-
-```bash
-shopify app dev
-```
-
-Follow the Shopify CLI prompts to connect the project to your Shopify app and development store.
-
-## Shopify setup
-
-After starting the app locally or deploying it:
-
-1. Open Shopify Admin.
-2. Go to **Settings**.
-3. Open **Customer accounts**.
-4. Open the checkout and accounts editor.
-5. Add the **Buy again** order action.
-6. Optional: change the **Button label** setting.
-7. Save the editor.
-8. Open a customer account order page and test the action.
-
 ## Button label setting
 
 Merchants can rename the button from Shopify's checkout and accounts editor.
@@ -254,27 +118,27 @@ Example merchant labels:
 - Order again
 - Repeat this order
 
-## Deploying
+## Limitations
 
-Build the app:
+This app uses Shopify's URL-based cart add flow.
 
-```bash
-npm run build
-```
+That is good for:
 
-Deploy to Shopify:
+- Adding variants
+- Adding quantities
+- Preserving the customer's existing cart
+- Keeping the app backend-free
 
-```bash
-npm run deploy
-```
+However, URL-based cart add behavior is limited for advanced line item data.
 
-or:
+If your store needs exact custom line item properties for every reordered line item, then you should extend this app with one of these approaches:
 
-```bash
-shopify app deploy
-```
+- Storefront Ajax Cart API bridge
+- App proxy route
+- Theme app extension
+- Custom storefront route
 
-Then release the deployed app version from the Shopify Partner Dashboard if required.
+The current version focuses on the safest lightweight default: reorder variants and quantities without storefront performance overhead.
 
 ## Distribution options
 
@@ -300,47 +164,81 @@ That usually means:
 
 This repository is currently optimized for free open-source distribution.
 
-## Access scopes
+## Requirements
 
-The app is intentionally minimal.
+- Node.js 20.10+
+- npm
+- Git
+- Shopify Partner or Dev Dashboard account
+- A Shopify development store with new customer accounts enabled
 
-Current scope:
+Shopify CLI is now a devDependency, so commands run through `npm run` by default. If you prefer a global install, you can still use:
 
-```txt
-customer_read_orders
+```bash
+npm install -g @shopify/cli@latest
 ```
 
-This is used so the customer account extension can read order line items for the reorder action.
+## Installation
 
-## Limitations
+Clone the repository:
 
-This app uses Shopify's URL-based cart add flow.
+```bash
+git clone https://github.com/dipunjab/Buy-Again---Shopify-App.git
+cd Buy-Again---Shopify-App
+npm install
+```
 
-That is good for:
+Warning: use this repo as-is. Do NOT start from the Shopify app starter template and copy files in; it brings old package versions and permission scopes that can cause deploy errors.
 
-- Adding variants
-- Adding quantities
-- Preserving the customer's existing cart
-- Keeping the app backend-free
+## Connect your own Shopify app
 
-However, URL-based cart add behavior is limited for advanced line item data.
+This repository does not commit a real `shopify.app.toml` file.
 
-If your store needs exact custom line item properties for every reordered line item, then you should extend this app with one of these approaches:
+That is intentional.
 
-- Storefront Ajax Cart API bridge
-- App proxy route
-- Theme app extension
-- Custom storefront route
+Each developer or merchant should link the project to their own Shopify app before running or deploying it:
 
-The current version focuses on the safest lightweight default: reorder variants and quantities without storefront performance overhead.
+```bash
+npm run shopify -- app config link
+```
 
-## Line item properties note
+Or directly:
 
-Shopify has multiple cart APIs and cart URL behaviors. They do not all support the same data shape.
+```bash
+shopify app config link
+```
 
-For simple repeat purchase flows, variant ID plus quantity is often enough.
+You can also copy the example file:
 
-For stores selling customized products, engraved products, bundle configurations, file uploads, or products that depend heavily on custom line item properties, additional storefront-side logic may be required.
+```bash
+cp shopify.app.example.toml shopify.app.toml
+```
+
+Then replace:
+
+```toml
+client_id = "replace-with-your-shopify-client-id"
+```
+
+with your own Shopify app client ID from the Shopify Partner Dashboard. Choose **Create new app** if you are setting up a new app, or use the config file for a linked app.
+
+Do not commit your real `shopify.app.toml`.
+
+`client_id` is public and identifies your Partner app, but committing a real app-specific config can link forks to the wrong app. Never commit the client secret.
+
+## Required setup (otherwise the button stays disabled)
+
+1. `shopify.app.toml` must include `scopes = "customer_read_orders"`.
+2. Run `npm run deploy`, choose to release the version, and confirm in the Dev Dashboard that the version is **Active** and includes the required scope.
+3. Set the app to **Custom distribution** in the Dev Dashboard and install it with the install link on your store. This is required because the Customer Account API needs Level 1 protected customer data access; public apps must request it, and the new dashboard may not expose a request button. Changing distribution may not be fully reversible, so use a test app first.
+4. The install permission screen must mention **Orders**. If you change scopes later, uninstall and reinstall the app, then log out and back in as the customer because the customer session keeps the old permissions.
+5. In the store admin, go to **Settings > Customer accounts > Customize**, open the **Order** page, add the **Buy again** action, save, and publish.
+
+## Test it
+
+Place a test order with at least two products, ideally including one line item that has a variant and a product that is still available.
+
+Open the customer account order page, click the **Buy again** action, and verify that the shopper is sent to the storefront cart with the previous order items added.
 
 ## Development commands
 
@@ -354,10 +252,10 @@ npm run deploy
 Useful Shopify CLI commands:
 
 ```bash
-shopify app dev
-shopify app build
-shopify app deploy
-shopify app info
+npm run shopify -- app dev
+npm run shopify -- app build
+npm run shopify -- app deploy
+npm run shopify -- app info
 ```
 
 ## Project structure
@@ -372,44 +270,14 @@ shopify app info
 |   +-- buy-again
 |       +-- src
 |           +-- MenuActionItem.jsx
-+-- shopify.app.toml
++-- shopify.app.example.toml
++-- shopify.app.toml (local only, not committed)
 +-- package.json
 +-- README.md
 +-- LICENSE
 +-- SECURITY.md
 +-- CHANGELOG.md
 ```
-
-## Good use cases
-
-Buy Again can be useful for Shopify stores selling:
-
-- Supplements
-- Cosmetics and beauty products
-- Pet food and pet supplies
-- Grocery and food products
-- Coffee and tea
-- Office supplies
-- B2B repeat-purchase products
-- Hobby supplies
-- Replacement parts
-- Frequently reordered products
-
-## Not ideal for
-
-The default version may not be enough for stores where every order line depends on complex custom data, such as:
-
-- Heavy product personalization
-- Upload-based products
-- Complex bundle builders
-- Line-item-property-based pricing
-- Draft-order-only workflows
-
-Those stores can still use this project as a base, but they will likely need a storefront Ajax or app proxy enhancement.
-
-## SEO description
-
-Buy Again is a free open-source Shopify reorder app that adds a Buy again button to Shopify customer account order pages. It helps customers reorder previous purchases, add items back to cart, and complete repeat purchases faster without storefront scripts or theme edits.
 
 ## FAQ
 

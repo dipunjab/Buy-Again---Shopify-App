@@ -14,9 +14,10 @@ automatically_update_urls_on_dev = true
 include_config_on_deploy = true
 
 [webhooks]
-api_version = "2026-10"
+api_version = "2026-07"
 
 [access_scopes]
+# REQUIRED. customer_read_orders lets the extension read order line items. Without it the button stays disabled.
 scopes = "customer_read_orders"
 
 [auth]

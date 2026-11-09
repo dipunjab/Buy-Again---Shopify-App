@@ -6,8 +6,8 @@ const HIGHLIGHTS = [
   },
   {
     label: '02',
-    title: 'Cart preserving',
-    body: 'Uses Shopify cart add routes so existing cart items are not cleared.',
+    title: 'Cart add link',
+    body: "Builds a Shopify cart add link from the order's variants and quantities.",
   },
   {
     label: '03',
@@ -17,9 +17,9 @@ const HIGHLIGHTS = [
 ];
 
 const STEPS = [
-  'Run the app locally with Shopify CLI.',
-  'Open the checkout and accounts editor.',
-  'Add the Buy again order action to customer accounts.',
+  'Make sure the app has the customer_read_orders permission and the latest version is released.',
+  'Install the app on your store (custom distribution install link).',
+  'Open Settings > Customer accounts > Customize and add the Buy again action to the Order page.',
   'Optionally rename the button label in the extension settings.',
 ];
 
