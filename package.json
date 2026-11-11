@@ -23,6 +23,6 @@
   "author": "Muhammad Usman Ghani",
   "private": true,
   "engines": {
-    "node": ">=20.10.0"
+    "node": ">=22.12.0"
   }
 }

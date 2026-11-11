@@ -10,7 +10,7 @@ Buy Again is a Shopify customer account UI extension built for merchants and dev
 
 Buy Again adds a reorder action to Shopify's new customer accounts. When a customer opens a previous order, they can click **Buy again** and the app builds a Shopify cart add URL using the order's product variants and quantities.
 
-The customer is then sent to the storefront cart with those items added.
+The customer is then sent to the storefront cart. The flow is designed to add those items; verify the resulting cart behavior on your store.
 
 This app is intentionally small:
 
@@ -28,7 +28,7 @@ It is a focused Shopify extension-only app that does one job: help customers rep
 - Adds a **Buy again** order action inside Shopify customer accounts
 - Reads the current order through Shopify's Customer Account API
 - Adds previous order items back to the storefront cart
-- Preserves existing cart items instead of clearing the cart
+- Designed to add previous order items to the cart; verify cart behavior on your store
 - Supports a configurable merchant-facing button label
 - Runs only on Shopify customer account extension targets
 - Includes a clean Shopify Admin app home page
@@ -81,7 +81,7 @@ extensions/buy-again/src/MenuActionItem.jsx
 2. The extension gets the current order ID.
 3. It queries the Customer Account API for order line items.
 4. It extracts variant IDs and quantities.
-5. It builds a Shopify `/cart/add` URL.
+5. It builds a Shopify `/cart/add` URL designed to add the order items to the cart.
 6. The shopper is sent to the storefront cart.
 
 The default flow uses Shopify's cart URL behavior instead of a custom backend.
@@ -126,7 +126,7 @@ That is good for:
 
 - Adding variants
 - Adding quantities
-- Preserving the customer's existing cart
+- Adding previous order items to the cart (verify behavior on your store)
 - Keeping the app backend-free
 
 However, URL-based cart add behavior is limited for advanced line item data.
@@ -166,7 +166,7 @@ This repository is currently optimized for free open-source distribution.
 
 ## Requirements
 
-- Node.js 20.10+
+- Node.js 22.12+
 - npm
 - Git
 - Shopify Partner or Dev Dashboard account
@@ -240,6 +240,28 @@ Place a test order with at least two products, ideally including one line item t
 
 Open the customer account order page, click the **Buy again** action, and verify that the shopper is sent to the storefront cart with the previous order items added.
 
+## Test without running locally
+
+After the developer deploys the app with `npm run deploy`, there is no need to run `npm run dev` to test it. Install the app on a development store using the install link in the Dev Dashboard, then configure the **Buy again** action in the customer accounts editor and test it from an order.
+
+The developer deploys once for the initial install and deploys again after code changes. Store owners and customers install and use the app; they never run commands.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Button is greyed out | The extension could not load or read the order. | Open the browser console and look for `[buy-again]` messages. |
+| “Level 1 protected customer data access is required” | The app needs Level 1 protected customer data access. | Use **Custom distribution** and install with the install link in the Dev Dashboard. |
+| “Access denied for order field. Required access: customer_read_orders” | The active app version or customer session does not have the order scope. | Add `customer_read_orders`, deploy, uninstall and reinstall the app, then log out and back in as the customer. |
+| “You are not a member of the requested organization” | Shopify CLI is authenticated to a different organization. | Run `shopify auth logout`, `shopify auth login`, then `shopify app config link`. |
+| “api_version 2025-07 is not a valid API version” | An old API version is configured. | Use API version `2026-07` and `@shopify/ui-extensions` `~2026.7.0`. |
+| “Type reference ... could not be found” | The UI extensions package version does not match the extension API. | Set `@shopify/ui-extensions` to `~2026.7.0`. |
+| `npm ERESOLVE` errors | The project may have been started from the Shopify template, which can bring conflicting package versions. | Start from this repository and follow its setup instructions. |
+| npm engine errors | The installed Node.js version is too old. | Use Node.js 22.12 or newer. |
+| Blank page or `example.com` after install | The extension-only app has no website to display. | This is harmless. The app needs no website or hosting. |
+| App is installed but the button is missing | The action has not been added to the customer account order page. | Go to **Settings > Customer accounts > Customize**, add **Buy again** to the Order page, then save and publish. |
+| Two Buy again blocks appear | Old test apps are still installed. | Uninstall the old test apps from the store. |
+
 ## Development commands
 
 ```bash
@@ -285,6 +307,14 @@ npm run shopify -- app info
 
 No. The default version is extension-only and deployed through Shopify CLI. Shopify hosts the extension bundles.
 
+### Do I need hosting (Vercel, etc.)?
+
+No. Shopify hosts the extension bundle after the developer runs `npm run deploy`.
+
+### Do store owners or customers run `npm run deploy`?
+
+No. Only the developer runs `npm run deploy`, initially and again after code changes.
+
 ### Does it slow down my storefront?
 
 No storefront script is injected. The customer-facing extension only runs where Shopify mounts the customer account order action.
@@ -303,7 +333,7 @@ No. It sends shoppers to the cart so they can review items before checkout.
 
 ### Does it clear the customer's existing cart?
 
-No. The app uses a cart add route intended to add items while preserving existing cart contents.
+It is designed to add items from the previous order to the cart. Verify the cart behavior on your store.
 
 ### Does it support every line item property?
 

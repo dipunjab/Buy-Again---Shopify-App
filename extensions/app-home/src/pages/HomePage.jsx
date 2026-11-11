@@ -58,8 +58,9 @@ export default function HomePage() {
                 <s-heading>One-click reordering for Shopify customer accounts.</s-heading>
                 <s-paragraph>
                   A lightweight customer account extension that lets shoppers
-                  add products from a previous order back to their cart without
-                  installing storefront JavaScript or touching the theme.
+                  build a link designed to add products from a previous order
+                  to their cart, without installing storefront JavaScript or
+                  touching the theme. Verify cart behavior on your store.
                 </s-paragraph>
               </s-stack>
 
